@@ -3,7 +3,7 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+
 import { useRouter } from "next/navigation";
 
 import axios from "axios";
@@ -12,20 +12,22 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogFooter, D
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+
 import FileUpload from "@/components/file-upload";
+import { useModal } from "@/hooks/use-modal-store";
+import { useEffect } from "react";
 
 const formSchema = z.object({
 	name: z.string().min(1, { message: "Server name is required" }),
 	imageUrl: z.string().min(1, { message: "Server image is required" }),
 });
 
-const InitialModal = () => {
-	const [isMounted, setIsMounted] = useState(false);
+const EditServerModal = () => {
 	const router = useRouter();
-	useEffect(() => {
-		setIsMounted(true);
-	}, []);
+	const { type, isOpen, onClose, data } = useModal();
+
+	const { server } = data;
+	const isModalOpen = isOpen && type === "editServer";
 
 	const form = useForm({
 		resolver: zodResolver(formSchema),
@@ -36,23 +38,31 @@ const InitialModal = () => {
 	});
 	const isLoading = form.formState.isSubmitting;
 
+	useEffect(() => {
+		if (server) {
+			form.setValue("name", server.name);
+			form.setValue("imageUrl", server.imageUrl);
+		}
+	}, [server, form]);
+
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		try {
-			await axios.post("/api/servers", values);
+			await axios.patch(`/api/servers/${server?.id}`, values);
 			form.reset();
 			router.refresh();
-			window.location.reload();
+			onClose();
 		} catch (error) {
 			console.log(error);
 		}
 	};
 
-	if (!isMounted) {
-		return null;
-	}
+	const handleClose = () => {
+		form.reset();
+		onClose();
+	};
 
 	return (
-		<Dialog open>
+		<Dialog open={isModalOpen} onOpenChange={handleClose}>
 			{/* 	<DialogTrigger asChild>
 					<Button variant="outline">Edit Profile</Button>
 				</DialogTrigger> */}
@@ -99,7 +109,7 @@ const InitialModal = () => {
 						</div>
 						<DialogFooter>
 							<Button variant={"secondary"} type="submit" className="w-full">
-								Create
+								Save Changes
 							</Button>
 						</DialogFooter>
 					</form>
@@ -109,4 +119,4 @@ const InitialModal = () => {
 	);
 };
 
-export default InitialModal;
+export default EditServerModal;
