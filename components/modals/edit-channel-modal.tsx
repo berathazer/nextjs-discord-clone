@@ -27,39 +27,41 @@ const formSchema = z.object({
 	type: z.nativeEnum(ChannelType),
 });
 
-const CreateChannelModal = () => {
+const EditChannelModal = () => {
 	const router = useRouter();
 	const { type, isOpen, onClose, data } = useModal();
 
-	const isModalOpen = isOpen && type === "createChannel";
-	const { server, channelType } = data;
+	const isModalOpen = isOpen && type === "editChannel";
+	const { server, channelType, channel } = data;
+
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			name: "",
-			type: channelType || ChannelType.TEXT,
+			type: channel?.type || ChannelType.TEXT,
 		},
 	});
 
 	useEffect(() => {
-		if (channelType) {
-			form.setValue("type", channelType);
+		if (channel) {
+			form.setValue("name", channel.name);
+			form.setValue("type", channel.type);
 		} else {
 			form.setValue("type", ChannelType.TEXT);
 		}
-	}, [channelType, form]);
+	}, [channelType, form, channel]);
 
 	const isLoading = form.formState.isSubmitting;
 
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		try {
 			const url = qs.stringifyUrl({
-				url: "/api/channels",
+				url: `/api/channels/${channel?.id}`,
 				query: {
 					serverId: server?.id,
 				},
 			});
-			await axios.post(url, values);
+			await axios.patch(url, values);
 			form.reset();
 			router.refresh();
 			onClose();
@@ -80,7 +82,7 @@ const CreateChannelModal = () => {
 				</DialogTrigger> */}
 			<DialogContent className="sm:max-w-[425px] bg-light text-black">
 				<DialogHeader className="py-4">
-					<DialogTitle className="text-center text-lg">Create a channel</DialogTitle>
+					<DialogTitle className="text-center text-lg">Edit channel</DialogTitle>
 					<DialogDescription className="text-zinc-500">Give your server a personality with a name and an image. You can always change it later</DialogDescription>
 				</DialogHeader>
 				<Form {...form}>
@@ -135,7 +137,7 @@ const CreateChannelModal = () => {
 						</div>
 						<DialogFooter>
 							<Button variant={"secondary"} type="submit" className="w-full">
-								Create
+								Save Changes
 							</Button>
 						</DialogFooter>
 					</form>
@@ -145,4 +147,4 @@ const CreateChannelModal = () => {
 	);
 };
 
-export default CreateChannelModal;
+export default EditChannelModal;

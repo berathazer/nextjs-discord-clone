@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import ModalProvider from "@/components/providers/modal-provider";
 
 import { cn } from "@/lib/utils";
+import { SocketProvider } from "@/components/providers/socket-provider";
 const font = Open_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -20,8 +21,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			<html lang="en" suppressHydrationWarning>
 				<body className={cn(font.className, "bg-light dark:bg-dark")}>
 					<ThemeProvider attribute="class" defaultTheme="dark" storageKey="discord-theme" enableSystem={false}>
-						<ModalProvider />
-						{children}
+						<SocketProvider>
+							<ModalProvider />
+							{children}
+						</SocketProvider>
 					</ThemeProvider>
 				</body>
 			</html>
