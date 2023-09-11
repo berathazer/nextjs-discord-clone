@@ -8,6 +8,7 @@ import ModalProvider from "@/components/providers/modal-provider";
 
 import { cn } from "@/lib/utils";
 import { SocketProvider } from "@/components/providers/socket-provider";
+import QueryProvider from "@/components/providers/query-provider";
 const font = Open_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -23,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 					<ThemeProvider attribute="class" defaultTheme="dark" storageKey="discord-theme" enableSystem={false}>
 						<SocketProvider>
 							<ModalProvider />
-							{children}
+							<QueryProvider>{children}</QueryProvider>
 						</SocketProvider>
 					</ThemeProvider>
 				</body>
