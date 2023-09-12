@@ -51,7 +51,7 @@ const DeleteMessageModal = () => {
 						Cancel
 					</Button>
 					<Button disabled={isLoading} type="submit" onClick={onDelete} variant={"destructive"}>
-						Delete Channel
+						Delete Message
 					</Button>
 				</DialogFooter>
 			</DialogContent>

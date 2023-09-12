@@ -18,6 +18,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/hooks/use-modal-store";
+import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 
 interface ChatItemProps {
 	id: string;
@@ -47,6 +49,9 @@ const formSchema = z.object({
 const ChatItem = ({ content, currentMember, deleted, fileUrl, id, isUpdated, member, socketQuery, socketUrl, timestamp }: ChatItemProps) => {
 	const [isEditing, setIsEditing] = useState(false);
 
+	const router = useRouter();
+	const params = useParams();
+
 	const { onOpen } = useModal();
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -55,11 +60,24 @@ const ChatItem = ({ content, currentMember, deleted, fileUrl, id, isUpdated, mem
 		},
 	});
 
+	const isLoading = form.formState.isSubmitting;
+
 	useEffect(() => {
 		form.reset({
 			content: content,
 		});
 	}, [content]);
+
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "Escape" || e.keyCode === 27) {
+				setIsEditing(false);
+				form.reset();
+			}
+		};
+		document.addEventListener("keydown", handleKeyDown);
+		return () => document.removeEventListener("keydown", handleKeyDown);
+	}, []);
 
 	const fileType = fileUrl?.split(".").pop();
 
@@ -73,17 +91,6 @@ const ChatItem = ({ content, currentMember, deleted, fileUrl, id, isUpdated, mem
 
 	const isPdf = fileType === "pdf" && fileUrl;
 	const isImage = !isPdf && fileUrl;
-
-	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if (e.key === "Escape" || e.keyCode === 27) {
-				setIsEditing(false);
-				form.reset();
-			}
-		};
-		document.addEventListener("keydown", handleKeyDown);
-		return () => document.removeEventListener("keydown", handleKeyDown);
-	}, []);
 
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		try {
@@ -99,17 +106,26 @@ const ChatItem = ({ content, currentMember, deleted, fileUrl, id, isUpdated, mem
 			console.log("chatItemError:", error);
 		}
 	};
-	const isLoading = form.formState.isSubmitting;
+
+	const onMemberClick = () => {
+		if (member.id === currentMember.id) {
+			return;
+		}
+
+		router.push(`/servers/${params?.serverId}/conversations/${member.id}`);
+	};
 	return (
 		<div className="relative group flex items-center hover:bg-black/5 p-4 transition w-full">
 			<div className="group flex gap-x-2 items-start w-full">
-				<div className="cursor-pointer hover:drop-shadow-md transition">
+				<div onClick={onMemberClick} className="cursor-pointer hover:drop-shadow-md transition">
 					<UserAvatar src={member.profile.imageUrl} />
 				</div>
 				<div className="flex flex-col w-full text-sm gap-y-1">
 					<div className="flex items-center gap-x-2">
 						<div className="flex items-center gap-x-2">
-							<p className="font-semibold text-sm hover:underline cursor-pointer">{member.profile.name}</p>
+							<p onClick={onMemberClick} className="font-semibold text-sm hover:underline cursor-pointer">
+								{member.profile.name}
+							</p>
 							<ActionTooltip label={member.role}>{roleIconMap[member.role]}</ActionTooltip>
 						</div>
 						<span className=" text-xs text-zinc-500 dark:text-zinc-400">{timestamp}</span>

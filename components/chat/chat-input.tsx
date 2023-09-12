@@ -34,8 +34,6 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
 		resolver: zodResolver(formSchema),
 	});
 
-	const isLoading = form.formState.isSubmitting;
-
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		try {
 			const url = qs.stringifyUrl({
@@ -50,6 +48,8 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
 		}
 	};
 
+	const isLoading = form.formState.isSubmitting;
+
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -61,6 +61,7 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
 							<FormControl>
 								<div className="relative p-4 pb-6">
 									<button
+										disabled={isLoading}
 										type="button"
 										onClick={() => onOpen("messageFile", { apiUrl, query })}
 										className="absolute top-7 left-8 h-6 w-6 bg-zinc-500 dark:bg-zinc-400 hover:bg-zinc-600 dark:hover:bg-zinc-300 transition rounded-full p-1 flex items-center justify-center"
