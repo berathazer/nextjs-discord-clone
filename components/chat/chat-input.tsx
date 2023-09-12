@@ -12,6 +12,7 @@ import { Plus } from "lucide-react";
 import { useModal } from "@/hooks/use-modal-store";
 import EmojiPicker from "../emoji-picker";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface ChatInputProps {
 	apiUrl: string;
@@ -26,6 +27,7 @@ const formSchema = z.object({
 
 const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
 	const { onOpen } = useModal();
+
 	const router = useRouter();
 	const form = useForm<z.infer<typeof formSchema>>({
 		defaultValues: {
@@ -33,7 +35,7 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
 		},
 		resolver: zodResolver(formSchema),
 	});
-
+	const isLoading = form.formState.isSubmitting;
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		try {
 			const url = qs.stringifyUrl({
@@ -45,10 +47,9 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
 			router.refresh();
 		} catch (error) {
 			console.log("chatinputError:", error);
+		} finally {
 		}
 	};
-
-	const isLoading = form.formState.isSubmitting;
 
 	return (
 		<Form {...form}>
@@ -69,10 +70,10 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
 										<Plus className="text-white dark:text-[#313338]" />
 									</button>
 									<Input
-										disabled={isLoading}
 										className="px-14 py-6 bg-zinc-200/90 dark:bg-zinc-700/75 border-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-zinc-600 dark:text-zinc-200"
 										placeholder={`Message ${type === "conversation" ? name : "#" + name}`}
 										{...field}
+										disabled={isLoading}
 									/>
 									<div className="absolute top-7 right-8">
 										<EmojiPicker onChange={(emoji: string) => field.onChange(`${field.value} ${emoji}`)} />
