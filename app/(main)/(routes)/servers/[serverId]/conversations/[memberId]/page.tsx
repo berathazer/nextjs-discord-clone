@@ -19,6 +19,8 @@ interface MemberIdPageProps {
 	};
 }
 
+export const dynamic ="force-dynamic";
+
 const MemberIdPage = async ({ params, searchParams }: MemberIdPageProps) => {
 	const profile = await currentProfile();
 

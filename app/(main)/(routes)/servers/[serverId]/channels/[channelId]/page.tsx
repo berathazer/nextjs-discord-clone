@@ -14,6 +14,8 @@ interface ChannelIdPageProps {
 	};
 }
 
+export const dynamic = "force-dynamic";
+
 const ChannelIdPage = async ({ params }: ChannelIdPageProps) => {
 	const profile = await currentProfile();
 

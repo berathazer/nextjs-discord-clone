@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { redirectToSignIn } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 
-import React from "react";
+export const dynamic ="force-dynamic";
 
 const ServerIdPage = async ({ params }: { params: { serverId: string } }) => {
 	const profile = await currentProfile();

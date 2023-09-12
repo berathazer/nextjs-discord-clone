@@ -1,4 +1,3 @@
-"use client";
 import { Hash } from "lucide-react";
 import React from "react";
 import MobileToggle from "../mobile-toggle";
