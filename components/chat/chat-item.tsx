@@ -66,7 +66,7 @@ const ChatItem = ({ content, currentMember, deleted, fileUrl, id, isUpdated, mem
 		form.reset({
 			content: content,
 		});
-	}, [content]);
+	}, [form,content]);
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
