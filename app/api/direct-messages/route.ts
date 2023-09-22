@@ -77,7 +77,7 @@ export const GET = async (req: Request) => {
         })
 
     } catch (error) {
-        console.log("DIRECT_MESSAGES_GET_ERROR:", error);
+        console.log("DIRECT_MESSAGES_GET_ERROR");
         return new NextResponse("Internal Server Error", { status: 500 })
     }
 }

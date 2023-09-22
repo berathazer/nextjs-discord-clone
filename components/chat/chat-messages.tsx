@@ -48,6 +48,7 @@ const ChatMessages = ({ name, member, chatId, apiUrl, paramValue, paramKey, sock
 
 	useChatSocket({ queryKey, addKey, updateKey });
 	useChatScroll({ chatRef, bottomRef, loadMore: fetchNextPage, shouldLoadMore: !isFetchingNextPage && !!hasNextPage, count: data?.pages?.[0].items?.length ?? 0 });
+	
 	if (status == "loading") {
 		return (
 			<div className="flex flex-col flex-1 justify-center items-center">
